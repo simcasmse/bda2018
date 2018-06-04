@@ -6,4 +6,5 @@ target/
 .idea/*
 project/*
 spark-warehouse/*
-data/trip_data_*
+data/trip_data_1_1000k.csv
+data/trip_data_1_full.csv
