@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Scala template
+*.class
+*.log
+target/
+.idea/*
+project/*
+spark-warehouse/*
+data/trip_data_*
