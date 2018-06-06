@@ -3,6 +3,7 @@ import java.util.{Calendar, Locale}
 import java.util.concurrent.TimeUnit
 
 import com.esri.core.geometry.Point
+import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
@@ -21,6 +22,7 @@ object NYCTaxiApp {
       .getOrCreate()
   }
   val sc: SparkContext = spark.sparkContext
+  LogManager.getRootLogger.setLevel(Level.ERROR)
 
   import spark.implicits._
 
@@ -65,8 +67,6 @@ object NYCTaxiApp {
     )
   }
 
-
-
   // Define some useful UDF
   val hours = (pickup: Long, dropoff: Long) => {
     TimeUnit.HOURS.convert(dropoff - pickup, TimeUnit.MILLISECONDS)
@@ -84,8 +84,6 @@ object NYCTaxiApp {
     now.get(Calendar.HOUR_OF_DAY)
   }
 
-
-
   /*
     The safe function takes an argument named f of type S => T and returns a new S => Either[T, (S, Exception)] that
     will return either the result of calling f or, if an exception is thrown, a tuple containing the invalid
@@ -102,7 +100,6 @@ object NYCTaxiApp {
       }
     }
   }
-
 
   /*
      Parse the nyc_boroughs.geojson and wrap is into
@@ -122,7 +119,6 @@ object NYCTaxiApp {
     }).getOrElse("NA")
   }
 
-
   /*
     We will create a boroughDuration method that takes two instances of the Trip class and computes both the borough
     of the first trip and the duration in seconds between the dropoff time of the first trip and the pickup time of
@@ -134,13 +130,12 @@ object NYCTaxiApp {
     (b, d)
   }
 
-
   /*
      import, clean and prepare the data for analysis
    */
   def importAndClean(): Dataset[Trip] ={
     val taxiRaw = spark.read.option("header", "true").csv("data/trip_data_1_1000k.csv")
-    taxiRaw.show(10)
+    //taxiRaw.show(10)
     val safeParse = safe(parse)
     val taxiParsed = taxiRaw.rdd.map(safeParse)
     //taxiParsed.map(_.isLeft). countByValue(). foreach(println)
@@ -181,8 +176,6 @@ object NYCTaxiApp {
     // Group by passengers and count
     val averageNumberOfPassenger = taxiDone.groupBy("passenger_count").count()
     averageNumberOfPassenger.show()
-
-
 
     // Sessionization
     /*
@@ -258,6 +251,4 @@ object NYCTaxiApp {
       }
     }
   }
-
 }
-
