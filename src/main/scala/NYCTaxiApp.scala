@@ -191,7 +191,9 @@ object NYCTaxiApp {
       of events over time, is called sessionization, and is commonly performed over web
       logs to analyze the behavior of the users of a website.
     */
-    val sessions = taxiDone. repartition($"license"). sortWithinPartitions($"license", $"pickupTime")
+    val sessions = taxiDone.
+      repartition($"license").
+      sortWithinPartitions($"license", $"pickupTime")
     sessions.cache()
 
     taxiDone.select(dayOfWeekUDF($"pickupTime").as("dayOfWeek"),hourOfDayUDF($"pickupTime").as("hourOfDay"), $"passenger_count").
